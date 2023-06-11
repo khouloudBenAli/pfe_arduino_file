@@ -13,13 +13,18 @@
 /************* declaration des constanes *************/
 constexpr uint8_t RST_PIN = D3;
 constexpr uint8_t SS_PIN = D4;     
-const char* ssid = "Redmi Note 9 Pro";
-const char* password = "Ben@ali.4"; //DRTRG3FH0GM
-const char* mqtt_server = "192.168.143.154"; //MQTT broker IP address
+const char* ssid = "Orange-AAC0";
+const char* password = "DRTRG3FH0GM"; //DRTRG3FH0GM //Ben@ali.4
+const char* mqtt_server = "192.168.1.103"; //MQTT broker IP address
 const int PORT = 8883; 
 const char* topic = "acces";      // Replace with your MQTT topic
 const char* topic1 = "response";  //***ADDITION***
 const unsigned long delayDuration = 500; // 1 second
+unsigned long accessStartTime = 0;
+unsigned long deniedStartTime = 0;
+int deniedCount = 0;
+
+
 
 
 /************* declaration des variables *************/
@@ -113,12 +118,32 @@ void loop()
   
   if(message == "accepted"){
     digitalWrite(access, HIGH);
+    accessStartTime = currentTime; // Start the timer for access LED
     digitalWrite(denied, LOW);
     
   }else if (message == "denied"){
     digitalWrite(access, LOW);
+    deniedStartTime = currentTime; // Start the timer for denied LED
     digitalWrite(denied, HIGH);
   }
+
+  /************************************************************************/
+  // Check if access LED duration has elapsed (2 seconds)
+    if (digitalRead(access) == HIGH && currentTime - accessStartTime >= 2000) {
+      digitalWrite(access, LOW);
+    }
+
+    // Check if denied LED duration has elapsed (3 times, 1 second each)
+    if (digitalRead(denied) == HIGH && currentTime - deniedStartTime >= 1000) {
+      deniedCount++;
+      digitalWrite(denied, LOW);
+      deniedStartTime = currentTime; // Start the timer for the next denied LED
+    }
+
+    if (deniedCount >= 3) {
+      digitalWrite(denied, LOW);
+    }
+  /************************************************************************/
 
   if (!rfid.PICC_IsNewCardPresent())
     return;
