@@ -6,8 +6,8 @@
 #include <MFRC522.h>
 
 //#define lock D8 
-#define access D0 
-#define denied D8 
+#define access D1 
+#define denied D1 
 #define buzzer D2 
 
 /************* declaration des constanes *************/
@@ -118,23 +118,34 @@ void loop()
   
   if(message == "accepted"){
     digitalWrite(access, HIGH);
-    accessStartTime = currentTime; // Start the timer for access LED
-    digitalWrite(denied, LOW);
-    
-  }else if (message == "denied"){
+    delay(1000);
     digitalWrite(access, LOW);
-    deniedStartTime = currentTime; // Start the timer for denied LED
-    digitalWrite(denied, HIGH);
+    message="";
+
+  }else if (message == "denied"){
+    digitalWrite(access, HIGH);
+    delay(300);
+    digitalWrite(access, LOW);
+    delay(100);
+    digitalWrite(access, HIGH);
+    delay(300);
+    digitalWrite(access, LOW);
+    delay(100);
+    digitalWrite(access, HIGH);
+    delay(300);
+    digitalWrite(access, LOW);
+    delay(100);
+    message="";
   }
 
   /************************************************************************/
   // Check if access LED duration has elapsed (2 seconds)
-    if (digitalRead(access) == HIGH && currentTime - accessStartTime >= 2000) {
+    if (digitalRead(access) == HIGH && currentTime - accessStartTime >= 1000) {
       digitalWrite(access, LOW);
     }
 
     // Check if denied LED duration has elapsed (3 times, 1 second each)
-    if (digitalRead(denied) == HIGH && currentTime - deniedStartTime >= 1000) {
+    if (digitalRead(denied) == HIGH && currentTime - deniedStartTime >= 300) {
       deniedCount++;
       digitalWrite(denied, LOW);
       deniedStartTime = currentTime; // Start the timer for the next denied LED

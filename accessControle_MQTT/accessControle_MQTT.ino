@@ -1,4 +1,3 @@
-
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
 #include <ArduinoJson.h> 
@@ -120,11 +119,13 @@ void loop()
     digitalWrite(access, HIGH);
     accessStartTime = currentTime; // Start the timer for access LED
     digitalWrite(denied, LOW);
+    message = "";
     
   }else if (message == "denied"){
     digitalWrite(access, LOW);
     deniedStartTime = currentTime; // Start the timer for denied LED
     digitalWrite(denied, HIGH);
+    message = "";
   }
 
   /************************************************************************/
@@ -174,7 +175,4 @@ void loop()
   }
 }
 }
-
-
-
 
